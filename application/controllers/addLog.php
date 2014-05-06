@@ -6,10 +6,10 @@ if (!defined('BASEPATH'))
 class AddLog extends SpotOnSubServer {
 
     public function index() {
-//        $uuid = $this->input->get('uuid');
-//        $data = $this->input->get('data');
-        $uuid = "6ae86830dc3cc15c";
-        $data = '[{"media_ID":"7","stop_time":"2014-04-21 17:16:26","shd_name":"POV","story_ID":"6","dsp_ID":"5","duration":"15125","story_name":"POV-image","dsp_name":"Video","shd_ID":"","pl_name":"POV_video","pl_ID":"6","start_time":"2014-04-21 17:16:11","media_name":"8bc3a-biore_facial_foam_spot_2d_15sec.mp4","dpm_ID":"26","lyt_name":"POV screen","lyt_ID":"3"}]';
+        $uuid = $this->input->post('uuid');
+        $data = $this->input->post('data');
+//        $uuid = "6ae86830dc3cc15c";
+//        $data = '[{"media_ID":"7","stop_time":"2014-04-21 17:16:26","shd_name":"POV","story_ID":"6","dsp_ID":"5","duration":"15125","story_name":"POV-image","dsp_name":"Video","shd_ID":"","pl_name":"POV_video","pl_ID":"6","start_time":"2014-04-21 17:16:11","media_name":"8bc3a-biore_facial_foam_spot_2d_15sec.mp4","dpm_ID":"26","lyt_name":"POV screen","lyt_ID":"3"}]';
 
 
         if ($uuid && $data) {

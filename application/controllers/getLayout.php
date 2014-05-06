@@ -4,8 +4,8 @@ class GetLayout extends SpotOnSubServer {
 
     public function index()
     {
-//        $uuid = $this->input->get('uuid');
-        $uuid = "6ae86830dc3cc15c";
+        $uuid = $this->input->get('uuid');
+//        $uuid = "6ae86830dc3cc15c";
         if ($uuid)
 	{
             $this->getLayoutToXml($uuid);

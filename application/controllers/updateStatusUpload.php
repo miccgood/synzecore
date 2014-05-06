@@ -1,22 +1,22 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class UpdateStatus extends SpotOnSubServer {
+class UpdateStatusUpload extends SpotOnSubServer {
 
     public function index()
     {
-//        $uuid = $this->input->get('uuid');
-//        $statusId = $this->input->get('status');
-//        $message = $this->input->get('message');
-        $uuid = "6ae86830dc3cc15c";
-        $statusId = "1";
-        $message = "testMessage";
+        $uuid = $this->input->get('uuid');
+        $statusId = $this->input->get('status');
+        $message = $this->input->get('message');
+//        $uuid = "6ae86830dc3cc15c";
+//        $statusId = "1";
+//        $message = "testMessage";
         if ($uuid && $statusId && $message)
 	{
-            $this->updateStatus($uuid, $statusId, $message);
+            $this->updateStatusUploadByUUID($uuid, $statusId, $message);
 	}
     }
     
-    private function updateStatus($uuid, $statusId, $message)
+    private function updateStatusUploadByUUID($uuid, $statusId, $message)
     {
         $where = array("tmn_uuid" => $uuid);
         

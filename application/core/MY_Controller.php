@@ -2,18 +2,6 @@
 
 class SpotOnSubServer extends CI_Controller {
     
-    private $outputXml = array();
-    private $mapId = array(
-                            "display" => "dsp_ID"
-                            ,"layout" => "lyt_ID"
-                            ,"story" => "story_ID"
-                            ,"media" => "media_ID"
-                            ,"playlist" => "pl_ID"
-                            ,"scheduling" => "sch_ID"
-                            ,"deployment" => "dpm_ID"
-                            ,"player" => "tmn_ID"
-                        );
-
     function __construct() {
         parent::__construct();
 
@@ -44,6 +32,47 @@ class SpotOnSubServer extends CI_Controller {
         $this->load->view('xml', $data);
     }
     /* -------------- End create output --------------- */
+    
+    protected function convertXmlObjToArr($obj, &$arr) 
+    { 
+        $children = $obj->children(); 
+        foreach ($children as $elementName => $node) 
+        { 
+            $nextIdx = count($arr); 
+            $arr[$nextIdx] = array(); 
+            $arr[$nextIdx]['@name'] = strtolower((string)$elementName); 
+            $arr[$nextIdx]['@attributes'] = array(); 
+            $attributes = $node->attributes(); 
+            foreach ($attributes as $attributeName => $attributeValue) 
+            { 
+                $attribName = strtolower(trim((string)$attributeName)); 
+                $attribVal = trim((string)$attributeValue); 
+                $arr[$nextIdx]['@attributes'][$attribName] = $attribVal; 
+            } 
+            $text = (string)$node; 
+            $text = trim($text); 
+            if (strlen($text) > 0) 
+            { 
+                $arr[$nextIdx]['@text'] = $text; 
+            } 
+            $arr[$nextIdx]['@children'] = array(); 
+            $this->convertXmlObjToArr($node, $arr[$nextIdx]['@children']); 
+        } 
+        return; 
+    }  
+    
+    protected function getDataFromUrl($path){
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL,$path);
+	curl_setopt($ch, CURLOPT_FAILONERROR,1);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+	$retValue = curl_exec($ch);			 
+	curl_close($ch);
+	return $retValue;
+    }
+    
     
     protected function getPkFormReq($index) {
         $pk = $this->input->get($index);
