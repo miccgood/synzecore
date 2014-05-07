@@ -1,6 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class SpotOnSubServer extends CI_Controller {
+class SpotOnTerminal extends CI_Controller {
     
     function __construct() {
         parent::__construct();
@@ -25,13 +25,24 @@ class SpotOnSubServer extends CI_Controller {
         $this->xml_writer->initiate(array("width" => "1920", "height" => "1080"));
     }
 
-    /* --------------- start create output ----------------- */
-    protected function output() {
-        $data = array();
-        $data['xml'] = $this->xml_writer->getXml(FALSE);
-        $this->load->view('xml', $data);
+    
+    protected function convertXmlToArray($xml){
+        $array = array();
+        $tagName = $xml->getName();
+        $array[$tagName] = unserialize(serialize(json_decode(json_encode((array) $xml), 1)));
+        return $array;
+        
+//        return unserialize(serialize(json_decode(json_encode((array) $xml), 1)));;
     }
-    /* -------------- End create output --------------- */
+       
+    protected function convertXmlToJson($xml){
+        $array = array();
+        $tagName = $xml->getName();
+        $array[$tagName] = (array) $xml;
+        return json_encode((array) $array);
+        
+//        return unserialize(serialize(json_decode(json_encode((array) $xml), 1)));;
+    }
     
     protected function convertXmlObjToArr($obj, &$arr) 
     { 
@@ -61,7 +72,7 @@ class SpotOnSubServer extends CI_Controller {
         return; 
     }  
     
-    protected function getDataFromUrl($path){
+    protected function getXmlFromUrl($path){
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL,$path);
 	curl_setopt($ch, CURLOPT_FAILONERROR,1);
@@ -203,6 +214,66 @@ class SpotOnSubServer extends CI_Controller {
         $var = $tmp;
         return $ret;
     }
+}
 
+class SpotOnTerminalAdd extends SpotOnTerminal{
+    public function index(){
+        echo $this->execute();
+    }
     
+    protected function execute(){
+        return false;
+    }
+}
+
+abstract class SpotOnTerminalGet extends SpotOnTerminal{
+    
+    
+    public function index(){
+        echo false;
+    }
+    
+    public function xml() {
+        $data = $this->execute();
+        $this->outputXml($data);
+    }
+    
+    public function json() {
+        $data = $this->execute();
+        $this->outputJson($data);
+    }
+    
+    abstract protected function execute();
+
+    /* --------------- start create output ----------------- */
+   
+    private function outputXml($data = FALSE) {
+        header ("Content-Type:text/xml");
+        //ไม่ส่งข้อมูลเข้ามา
+        if($data === FALSE || $data === null){
+            //ให้ดึงมาจาก xml_writer
+            $data = array("dataOutput" => $this->xml_writer->getXml(FALSE));
+        } else {
+            //ถ้าส่งข้อมูลเข้ามา ให้เอาข้อมูลไปแสดงผล
+            $data = array("dataOutput" => $data);
+        }
+        $this->load->view('output', $data);
+    }
+    
+    private function outputJson($data = FALSE) {
+        header('Content-Type: application/json');
+        //ไม่ส่งข้อมูลเข้ามา
+        if($data === FALSE || $data === null){
+            //ให้ดึงมาจาก xml_writer
+            $sXML = $this->xml_writer->getXml(FALSE);
+            $oXML = new SimpleXMLElement($sXML);
+            $data = array("dataOutput" => $this->convertXmlToJson($oXML));
+        } else {
+            //ถ้าส่งข้อมูลเข้ามา ให้เอาข้อมูลไปแสดงผล
+            $data = array("dataOutput" => $data);
+        }
+        $this->load->view('output', $data);
+    }
+    
+    /* -------------- End create output --------------- */
 }

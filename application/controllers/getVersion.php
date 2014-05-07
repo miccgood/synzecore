@@ -1,8 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class GetVersion extends SpotOnSubServer {
+class GetVersion extends SpotOnTerminalGet {
 
-    public function index()
+    public function execute()
     {
         $uuid = $this->input->get('uuid');
 //        $uuid = "6ae86830dc3cc15c";
@@ -22,7 +22,7 @@ class GetVersion extends SpotOnSubServer {
             $this->xml_writer->startBranch('story', $checkSum[0]);
             $this->xml_writer->endBranch();
         }
-        $this->output();
+//        $this->output();
     }
 }
 

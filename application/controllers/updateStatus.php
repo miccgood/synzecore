@@ -1,8 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class UpdateStatus extends SpotOnSubServer {
+class UpdateStatus extends SpotOnTerminalAdd {
 
-    public function index()
+    public function execute()
     {
         $uuid = $this->input->get('uuid');
         $statusId = $this->input->get('status');
@@ -12,8 +12,10 @@ class UpdateStatus extends SpotOnSubServer {
 //        $message = "testMessage";
         if ($uuid && $statusId && $message)
 	{
-            $this->updateStatusByUUID($uuid, $statusId, $message);
-	}
+            return $this->updateStatusByUUID($uuid, $statusId, $message);
+	} else {
+            return false;
+        }
     }
     
     private function updateStatusByUUID($uuid, $statusId, $message)
@@ -25,5 +27,7 @@ class UpdateStatus extends SpotOnSubServer {
                         "tmn_status_update" => date("YmdHis", time()));
         
         $this->m->updatePlayerByPlayerId($player, $where);
+        
+        return true;
     }
 }

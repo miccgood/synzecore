@@ -1,8 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class GetLayout extends SpotOnSubServer {
+class GetLayout extends SpotOnTerminalGet {
 
-    public function index()
+    public function execute()
     {
         $uuid = $this->input->get('uuid');
 //        $uuid = "6ae86830dc3cc15c";
@@ -32,7 +32,8 @@ class GetLayout extends SpotOnSubServer {
             }
             $this->xml_writer->endBranch();
         }
-        $this->output();
+        
+//        $this->output();
     }
 }
 
