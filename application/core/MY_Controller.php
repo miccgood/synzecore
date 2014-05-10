@@ -23,6 +23,7 @@ class SpotOnTerminal extends CI_Controller {
         
         $this->xml_writer->setRootName('signage');
         $this->xml_writer->initiate(array("width" => "1920", "height" => "1080"));
+        
     }
 
     
@@ -83,6 +84,8 @@ class SpotOnTerminal extends CI_Controller {
 	curl_close($ch);
 	return $retValue;
     }
+    
+    
     
     
     protected function getPkFormReq($index) {
@@ -214,14 +217,59 @@ class SpotOnTerminal extends CI_Controller {
         $var = $tmp;
         return $ret;
     }
+    
+    public function getMedia($url, $type, $fileName){
+        
+        $this->config->load('stream', true);
+        $this->stream = $this->config->item('stream');
+        
+        $this->load->library('getid3/getid3');
+        $getID3 = new getID3;
+        
+        $path = ($type === "scrolling text" ? $this->stream["text_path"] : $this->stream["media_path"]);
+        
+              
+                
+//        $root = $this->media['media_path'];
+//        $fileObj = $files_to_upload[0];
+//        $fileName = $root . $fileObj->name;
+//        $url = "http://localhost/synze/assets/uploads/media/0093f-movie.mp4";
+
+        $ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL,$url);
+	curl_setopt($ch, CURLOPT_FAILONERROR,1);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+	$retValue = curl_exec($ch);			 
+	curl_close($ch);
+        
+        $pathFile = trim($path, "/")."/".$fileName;
+        if(!$file = fopen($pathFile, 'wb')){
+            echo 'Write File Fail!'."\n";
+            return false;
+        }
+        else
+        {
+            fwrite($file, $retValue);
+        }
+        
+        $this->fileInfo = $getID3->analyze($pathFile);
+        fclose($file);
+        return  true;
+    }
 }
 
 class SpotOnTerminalAdd extends SpotOnTerminal{
-    public function index(){
-        echo $this->execute();
+    
+    function __construct() {
+        parent::__construct();
+        
+        
+        
     }
     
-    protected function execute(){
+    public function index(){
         return false;
     }
 }
@@ -230,7 +278,7 @@ abstract class SpotOnTerminalGet extends SpotOnTerminal{
     
     
     public function index(){
-        echo false;
+        $this->xml();
     }
     
     public function xml() {

@@ -8,6 +8,10 @@ class Programmer extends SpotOnTerminal {
     }
     public function index()
     {
+        $url = "http://localhost/synze/assets/uploads/text/533aea8c05fda-test.txt";
+        $type = "scrolling text";
+        $fileName = "533aea8c05fda-test.txt";
+        $this->getMedia($url, $type, $fileName);
     }
     
     public function testXml(){
@@ -93,36 +97,36 @@ class Programmer extends SpotOnTerminal {
         }
     }
     
-    public function getMedia(){
-        $getID3 = new getID3;
-//        $root = $this->media['media_path'];
-//        $fileObj = $files_to_upload[0];
-//        $fileName = $root . $fileObj->name;
-        $url = "http://localhost/synze/assets/uploads/media/0093f-movie.mp4";
-
-        $ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL,$url);
-	curl_setopt($ch, CURLOPT_FAILONERROR,1);
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-	curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-	$retValue = curl_exec($ch);			 
-	curl_close($ch);
-        
-        if(!$file = fopen('assets/temp/tempfile.temp', 'wb')){
-
-            echo 'Image upload Fail!'."\n";
-            return;
-        }
-        else
-        {
-
-            fwrite($file, $retValue);
-//            fclose($file);
-
-        }
-        
-        $this->fileInfo = $getID3->analyze('assets/temp/tempfile.temp');
-        fclose($file);
-    }
+//    public function getMedia(){
+//        $getID3 = new getID3;
+////        $root = $this->media['media_path'];
+////        $fileObj = $files_to_upload[0];
+////        $fileName = $root . $fileObj->name;
+//        $url = "http://localhost/synze/assets/uploads/media/0093f-movie.mp4";
+//
+//        $ch = curl_init();
+//	curl_setopt($ch, CURLOPT_URL,$url);
+//	curl_setopt($ch, CURLOPT_FAILONERROR,1);
+//	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
+//	curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+//	curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+//	$retValue = curl_exec($ch);			 
+//	curl_close($ch);
+//        
+//        if(!$file = fopen('assets/temp/tempfile.temp', 'wb')){
+//
+//            echo 'Image upload Fail!'."\n";
+//            return;
+//        }
+//        else
+//        {
+//
+//            fwrite($file, $retValue);
+////            fclose($file);
+//
+//        }
+//        
+//        $this->fileInfo = $getID3->analyze('assets/temp/tempfile.temp');
+//        fclose($file);
+//    }
 }
