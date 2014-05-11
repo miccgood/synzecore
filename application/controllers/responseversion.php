@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class GetVersion extends SpotOnTerminalGet {
+class ResponseVersion extends SpotOnTerminalGet {
 
     protected function execute()
     {
@@ -15,16 +15,20 @@ class GetVersion extends SpotOnTerminalGet {
     private function getVersionToXml($uuid)
     {
         $storylist = $this->m->selectStoryByUUID($uuid);
+        
         foreach ($storylist as $story) {
             // Start branch 'cars'
             $storyId = $story->story_ID;
             $checkSum = $this->m->selectDisplayAndMediaByStoryIdForCheckSum($storyId);
-            $this->xml_writer->startBranch('story', $checkSum[0]);
+            $tmn_uuid = array("tmn_uuid" => $story->tmn_uuid, "story_id" => $storyId);
+            $this->xml_writer->startBranch('story', array_merge($tmn_uuid, $checkSum[0]));
             $this->xml_writer->endBranch();
         }
 //        $this->output();
     }
-}
 
-/* End of file welcome.php */
-/* Location: ./application/controllers/welcome.php */
+//    protected function execute() {
+//        
+//    }
+
+}

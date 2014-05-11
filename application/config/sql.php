@@ -17,14 +17,15 @@ $config["selectStoryByUUID"] =
                 ,lyt.lyt_width
                 ,lyt.lyt_height
                 ,dpm.dpm_ID
+                ,dpm.tmn_uuid
         FROM mst_shd shd
             INNER JOIN mst_story story on(shd.story_ID = story.story_ID)
             INNER JOIN mst_lyt lyt on(lyt.lyt_ID = story.lyt_ID)
             INNER JOIN (
-                SELECT shd_ID, dpm_ID
+                SELECT shd_ID, dpm_ID, tmn.tmn_uuid 
                 FROM trn_dpm dpm
                 INNER JOIN mst_tmn tmn on(dpm.tmn_ID = tmn.tmn_ID OR dpm.tmn_grp_ID = tmn.tmn_grp_ID)
-                WHERE tmn.tmn_uuid = :uuid
+                WHERE tmn.tmn_uuid IN ( :uuid )
 
             ) AS dpm on(dpm.shd_ID = shd.shd_ID)
         WHERE  
@@ -124,3 +125,10 @@ $config["selectTmnByUUID"] = "
         ";
         
 // --- End addLog ---//
+
+
+
+
+$config["cronJobUpdateStatus"] = "update mst_tmn set `tmn_status_update` = NOW() WHERE ABS(TIME_TO_SEC(TIMEDIFF(`tmn_status_update`, NOW() ))) > 10";
+
+$config["cronJobUpdateUploadStatus"] = "update mst_tmn set `tmn_status_upload_update` = NOW() WHERE ABS(TIME_TO_SEC(TIMEDIFF(`tmn_status_upload_update`, NOW() ))) > 10";

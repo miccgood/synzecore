@@ -5,7 +5,7 @@ if (!defined('BASEPATH'))
 
 class AddLog extends SpotOnTerminalAdd {
 
-    protected function index() {
+    public function index() {
         $uuid = $this->input->post('uuid');
         $data = $this->input->post('data');
 //        $uuid = "6ae86830dc3cc15c";

@@ -17,12 +17,18 @@ class SpotOnTerminal extends CI_Controller {
         $this->load->library('xml_writer');
         $this->load->library('stringutils', FALSE);
         
+        
+        $this->config->load('stream', true);
+        $this->stream = $this->config->item('stream');
+        
 //        $this->load->library('session');
         $this->load->model('my_model', 'my_model');
         $this->load->model('spot_on_model', 'm');
         
         $this->xml_writer->setRootName('signage');
         $this->xml_writer->initiate(array("width" => "1920", "height" => "1080"));
+        
+        
         
     }
 
@@ -73,7 +79,7 @@ class SpotOnTerminal extends CI_Controller {
         return; 
     }  
     
-    protected function getXmlFromUrl($path){
+    protected function getDataFromUrl($path){
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL,$path);
 	curl_setopt($ch, CURLOPT_FAILONERROR,1);
@@ -219,7 +225,7 @@ class SpotOnTerminal extends CI_Controller {
     }
     
     public function getMedia($url, $type, $fileName){
-        
+         
         $this->config->load('stream', true);
         $this->stream = $this->config->item('stream');
         
@@ -228,8 +234,6 @@ class SpotOnTerminal extends CI_Controller {
         
         $path = ($type === "scrolling text" ? $this->stream["text_path"] : $this->stream["media_path"]);
         
-              
-                
 //        $root = $this->media['media_path'];
 //        $fileObj = $files_to_upload[0];
 //        $fileName = $root . $fileObj->name;
@@ -325,3 +329,68 @@ abstract class SpotOnTerminalGet extends SpotOnTerminal{
     
     /* -------------- End create output --------------- */
 }
+
+
+class SpotOnTerminalRequest extends SpotOnTerminal{
+    
+    protected $parentServer = "";
+            
+    function __construct() {
+        parent::__construct();
+        $this->config->load('server', true);
+        $this->server = $this->config->item('server');
+        
+        $this->parentServer = $this->server["parent_server"];
+        
+    }
+    
+    public function index(){
+        return false;
+    }
+}
+
+class SpotOnTerminalCronJob extends SpotOnTerminal{
+    
+    protected $parentServer = "";
+            
+    function __construct() {
+        parent::__construct();
+        $this->config->load('server', true);
+        $this->server = $this->config->item('server');
+        
+        $this->parentServer = $this->server["parent_server"];
+        
+    }
+    
+    public function index(){
+        date_default_timezone_set('Asia/Bangkok');
+        
+        //setting 
+        $interval = 10;// sec
+        $totalTime = (1 * 60 * 5);//sec
+        
+        $now = time();
+        $start    = new DateTime(date("YmdHis", $now));
+        $end      = new DateTime(date("YmdHis", $now + $totalTime));
+        $interval = new DateInterval('PT'.$interval.'S');
+        $period   = new DatePeriod($start, $interval, $end);
+        
+        $timeInterval = $interval->s;
+        foreach ($period as $dt)
+        {
+            // do something
+//            ob_start();
+            
+            $this->execute($dt);
+            
+//            ob_flush();
+            sleep($timeInterval);
+        }
+    }
+    
+    protected function execute($dt) {
+        echo $dt->format('H:i:s') . "\n";
+    }
+}
+
+

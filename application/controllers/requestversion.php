@@ -3,74 +3,60 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class AddLog extends SpotOnTerminalAdd {
+class requestVersion extends SpotOnTerminalRequest {
 
-    protected function execute() {
-        $uuid = $this->input->post('uuid');
-        $data = $this->input->post('data');
-//        $uuid = "6ae86830dc3cc15c";
-//        $data = '[{"media_ID":"7","stop_time":"2014-04-21 17:16:26","shd_name":"POV","story_ID":"6","dsp_ID":"5","duration":"15125","story_name":"POV-image","dsp_name":"Video","shd_ID":"","pl_name":"POV_video","pl_ID":"6","start_time":"2014-04-21 17:16:11","media_name":"8bc3a-biore_facial_foam_spot_2d_15sec.mp4","dpm_ID":"26","lyt_name":"POV screen","lyt_ID":"3"}]';
+    public function index() {
+        
+//        $url = $this->parentServer."getversion/json?uuid=6ae86830dc3cc15c";
+        $url = "http://localhost/synzecore/responseversion/json?uuid=6ae86830dc3cc15c,b11c94f457bebd84,eccb55feb3b20bd1,48e7b737efcd0b2e,72e4fe3c46e85726,33d7f88e467d62eb";
+        // ยิง request ไป server เอาข้อมูลมา
+        $sXml = $this->getDataFromUrl($url);
+        
+        
+        $array = json_decode($sXml, true);
+        
+        $changeVersion = array();
+        $isCheck = array();
+        $signage = $array["signage"];
+        foreach ($signage["story"] as $key => $value) {
+            $attributes = ($key === "@attributes" ? $value : $value["@attributes"]);
 
-        return ($uuid && $data ? $this->addLogAndLogItemByUUID($uuid, $data) : false);
-    }
-
-    private function addLogAndLogItemByUUID($uuid, $data) {
-        $tmnList = $this->m->selectTmnByUUID($uuid);
-        foreach ($tmnList as $tmn) {
-            $tmnGrpId = $tmn->tmn_grp_ID;
-            $tmnGrpName = $tmn->tmn_grp_name;
-            $tmnId = $tmn->tmn_ID;
-            $tmnName = $tmn->tmn_name;
-            $cpnId = $tmn->cpn_ID;
-
-            $tmnLogItem = Synze::createLogItem($tmnId, $tmnName, 'tmn', $cpnId);
-
-            $this->m->insertIgnoreLogItem($tmnLogItem);
-
-
-            $tmnGrpLogItem = Synze::createLogItem($tmnGrpId, $tmnGrpName, 'tmn', $cpnId);
-
-            $this->m->insertIgnoreLogItem($tmnGrpLogItem);
-
-            $arr = json_decode($data);
-
-            $count = 0;
-            try {
-                foreach ($arr as $row) {
-                    $log = array();
-
-                    $log['tmn_grp_ID'] = $tmnGrpId;
-                    $log['tmn_grp_name'] = $tmnGrpName;
-                    $log['tmn_ID'] = $tmnId;
-                    $log['tmn_name'] = $tmnName;
-
-                    foreach ($row as $field => $value) {
-                        if (Synze::toDBField($field) == 'start_time') {
-                            $log['start_date'] = date('Y-m-d', strtotime($value));
-                            $log['start_time'] = date('H:i:s', strtotime($value));
-                            //echo 'start_time'.date('H:m:s', strtotime($value)).';';
-                        } else if (Synze::toDBField($field) == 'stop_time') {
-                            $log['stop_date'] = date('Y-m-d', strtotime($value));
-                            $log['stop_time'] = date('H:i:s', strtotime($value));
-                            //echo 'stop_time'.date('H:m:s', strtotime($value)).';';
-                        } else {
-                            $log[Synze::toDBField($field)] = $value;
-                        }
-                    }
-
-                    foreach (array('media', 'pl', 'story', 'shd', 'dsp') as $field => $value) {
-                        $logItem = Synze::createLogItem($log[$value . '_ID'], $log[$value . '_name'], $value, $cpnId);
-
-                        $this->m->insertIgnoreLogItem($logItem);
-                    }
-                    $this->m->insertLog($log);
-                    $count++;
+            // ดึงข้อมูลที่ต้องการออกมาก่อน
+            $tmnUUID = $attributes["tmn_uuid"];
+            $checkSumServer=  $attributes["check_sum"];
+            $storyId = $attributes["story_id"];
+            
+            //ถ้ามีใน array ชุดนี้แล้วแปลว่าตรวจสอบแล้วให้ข้ามไป
+            if(array_key_exists($storyId, $isCheck)){
+                continue;
+            }
+            
+            $isCheck[$storyId] = $checkSumServer;
+            
+            var_dump($attributes);
+//            array_push($isCheck, $storyId);
+            
+            // ดึง story ออกมาจาก local 
+            $storylist = $this->m->selectStoryByUUID($tmnUUID);
+            
+            foreach ($storylist as $story) {
+                
+                $checkSumLocal = $this->selectDisplayAndMediaByStoryIdForCheckSum($story->story_ID);
+            
+                
+                //ถ้าไม่เท่ากัน แปลว่ามีการเปลี่ยนแปลง
+                if($checkSumServer != $checkSumLocal){
+                    $changeVersion[$tmnUUID] = $checkSumLocal;
                 }
-            } catch (Exception $exc) {
-                return false;
-            } 
-            return $count;
+            }
+            
+            
+            
         }
+        
+        
+        
+        
     }
 }
 

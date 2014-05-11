@@ -1,0 +1,1 @@
+cacls log.txt /g everyone:f

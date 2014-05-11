@@ -1,20 +1,21 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class GetLayout extends SpotOnTerminalGet {
+class ResponseLayout extends SpotOnTerminalGet {
 
     protected function execute()
     {
-        $uuid = $this->input->get('uuid');
+        $storyId = $this->input->get('story_id');
 //        $uuid = "6ae86830dc3cc15c";
-        if ($uuid)
+        if ($storyId)
 	{
-            $this->getLayoutToXml($uuid);
+            $this->getLayoutToXml($storyId);
 	}
     }
     
-    private function getLayoutToXml($uuid)
+    private function getLayoutToXml($storyId)
     {
-        $storylist = $this->m->selectStoryByUUID($uuid);
+        $storyId = "'".  str_replace(",", "', '", $storyId)."'";
+        $storylist = $this->m->selectWhereIn("mst_story", array("story_ID" => $storyId));
         foreach ($storylist as $story) {
             // Start branch 'cars'
             $this->xml_writer->startBranch('story', $story);

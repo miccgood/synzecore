@@ -6,12 +6,21 @@ class spot_on_model extends MY_Model  {
         parent::__construct();
     }    
     
+    public function select($table, $where){
+        return $this->db->where($where)->get($table)->result_array();
+    }
+    
+    public function selectWhereIn($table, $where){
+        return $this->db->get($table)->result_array();
+    }
+    
     public function getDisPlay() {
         return $this->db->limit(1)->get('mst_dsp')->result();
     }
     
     // --- Start getLayout --- //
     public function selectStoryByUUID($uuid){
+        $uuid = explode(",", $uuid);
         $bind = array(":uuid" => $uuid);
         $sql = $this->createNameQuery("selectStoryByUUID", $bind);
         return $this->db->query($sql)->result();  
@@ -35,7 +44,7 @@ class spot_on_model extends MY_Model  {
     public function selectDisplayAndMediaByStoryIdForCheckSum($storyId){
         $bind = array(":story_ID" => $storyId);
         $sql = $this->createNameQuery("selectDisplayAndMediaByStoryIdForCheckSum", $bind);
-        return $this->db->query($sql)->result();  
+        return $this->db->query($sql)->result_array();  
     }
     
     // --- End getLayout --- //
@@ -69,4 +78,13 @@ class spot_on_model extends MY_Model  {
     
     // --- End Update Status --- //
     
+    
+    // --- Start Cron Job --- //
+    
+    public function cronJobUpdateStatus(){
+        $sql = $this->createNameQuery("cronJobUpdateStatus");
+        return $this->db->query($sql); 
+    }
+     
+    // --- End Cron Job --- //
 }

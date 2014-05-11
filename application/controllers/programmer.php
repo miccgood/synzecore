@@ -6,6 +6,12 @@ class Programmer extends SpotOnTerminal {
         parent::__construct();
         $this->load->library('getid3/getid3');
     }
+    
+    public function message($to = 'World')
+    {
+            echo "Hello {$to}!".PHP_EOL;
+    }
+
     public function index()
     {
         $url = "http://localhost/synze/assets/uploads/text/533aea8c05fda-test.txt";
@@ -30,7 +36,7 @@ class Programmer extends SpotOnTerminal {
 //        // close cURL resource, and free up system resources
 //        curl_close($ch);
         
-        $sXML = $this->getXmlFromUrl($url);
+        $sXML = $this->getDataFromUrl($url);
         $oXML = new SimpleXMLElement($sXML);
 
 //        foreach($oXML->entry as $oEntry){
@@ -95,6 +101,11 @@ class Programmer extends SpotOnTerminal {
             fclose($file);
 
         }
+    }
+    
+    public function testCronjob(){
+        $re = $this->m->selectWhereIn("mst_story", array("story_ID", 46));
+        var_dump($re);
     }
     
 //    public function getMedia(){

@@ -35,6 +35,8 @@ class MY_Model extends CI_Model{
                     $bind_marker = $bind[$field];
                     if(is_string($bind_marker)){
                         $bind_marker = $this->db->escape($bind_marker);
+                    } else {
+                        $bind_marker = "'".join("', '", $bind_marker)."'";
                     }
                     $sql = str_replace($field, $bind_marker, $sql);
                     $bindList[] = $bind[$field];
